@@ -9,7 +9,7 @@ namespace DeathCounterNETShared.Twitch
         static readonly int TOKEN_EXPIRATION_THRESHOLD_IN_SECONDS = 5 * 60;
 
         static readonly int VALIDATE_REFRESH_TOKEN_TRY_COUNT = 10;
-        static readonly int VALIDATE_REFRESH_TOKEN_INTERVAL_IN_MILLISECONDS = 1 * 1000;
+        static readonly int VALIDATE_REFRESH_TOKEN_INTERVAL_IN_MILLISECONDS = 5 * 1000;
 
         protected TwitchAPI _api;
         protected Executor _executor;
