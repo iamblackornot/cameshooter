@@ -52,12 +52,12 @@ class BotApp
 
         if(File.Exists(USER_ACCESS_TOKEN_FILE))
         {
-            credentials.UserAccessToken = File.ReadAllText(USER_ACCESS_TOKEN_FILE);
+            credentials.UserAccessToken = File.ReadAllText(USER_ACCESS_TOKEN_FILE).Trim();
         }
 
         if(File.Exists(REFRESH_USER_ACCESS_TOKEN_FILE))
         {
-            credentials.RefreshUserAccessToken = File.ReadAllText(REFRESH_USER_ACCESS_TOKEN_FILE);
+            credentials.RefreshUserAccessToken = File.ReadAllText(REFRESH_USER_ACCESS_TOKEN_FILE).Trim();
         }
 
         return new BotApp(credentials);
