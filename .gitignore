@@ -1,0 +1,5 @@
+bin
+obj
+.rest
+.env
+.vscode
