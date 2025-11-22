@@ -106,4 +106,19 @@ namespace DeathCounterNETShared
             return result;
         }
     }
+
+    public static class StringExtensions
+    {
+        public static readonly char[] CHARS_TO_TRIM =
+        [
+            ' ', '\t', '\n', '\r', '\v', '\f', 
+            '\u034F', '\u200B', '\uFEFF', '\u200E', '\u200F' 
+        ];
+        public static string TrimExtended(this string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+
+            return input.Trim(CHARS_TO_TRIM);
+        }
+    }
 }

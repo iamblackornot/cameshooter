@@ -20,6 +20,7 @@ class BotApp
             }
         }
 
+        await RefreshToken();
         client.Connect();
         Console.ReadLine();
     }
@@ -52,12 +53,12 @@ class BotApp
 
         if(File.Exists(USER_ACCESS_TOKEN_FILE))
         {
-            credentials.UserAccessToken = File.ReadAllText(USER_ACCESS_TOKEN_FILE).Trim();
+            credentials.UserAccessToken = File.ReadAllText(USER_ACCESS_TOKEN_FILE).TrimExtended();
         }
 
         if(File.Exists(REFRESH_USER_ACCESS_TOKEN_FILE))
         {
-            credentials.RefreshUserAccessToken = File.ReadAllText(REFRESH_USER_ACCESS_TOKEN_FILE).Trim();
+            credentials.RefreshUserAccessToken = File.ReadAllText(REFRESH_USER_ACCESS_TOKEN_FILE).TrimExtended();
         }
 
         return new BotApp(credentials);
@@ -93,17 +94,7 @@ class BotApp
 
         if(validateRefreshRes.Data.IsValid)
         {
-            var refreshRes = await api.RefreshTokenAsync(api.Credentials.RefreshUserAccessToken);
-
-            if(!refreshRes.IsSuccessful)
-            {
-                return new BadResult(refreshRes.ErrorMessage);
-            }
-
-            UpdateTokens(refreshRes.Data);
-            ConsoleHelper.PrintInfo("UserAccessToken was refreshed successfully");
-
-            return new GoodResult();
+            return await RefreshToken();
         }
 
         var getTokenRes = await api.GetUserAccessToken(api.Credentials.AuthorizationCode);
@@ -120,6 +111,21 @@ class BotApp
         return new GoodResult();
     }
 
+    protected async Task<Result> RefreshToken()
+    {
+        var refreshRes = await api.RefreshTokenAsync(api.Credentials.RefreshUserAccessToken);
+
+        if(!refreshRes.IsSuccessful)
+        {
+            return new BadResult(refreshRes.ErrorMessage);
+        }
+
+        UpdateTokens(refreshRes.Data);
+        ConsoleHelper.PrintInfo("UserAccessToken was refreshed successfully");
+
+        return new GoodResult();
+    }
+
     protected void UpdateTokens(AuthCodeResponse response)
     {
         UpdateTokens(response.AccessToken, response.RefreshToken, response.ExpiresIn);
@@ -130,13 +136,12 @@ class BotApp
     }
     protected void UpdateTokens(string userAccessToken, string refreshToken, int expiresInSeconds)
     {
-        
-        api.Credentials.UserAccessToken = userAccessToken;
-        api.Credentials.RefreshUserAccessToken = refreshToken;
+        api.Credentials.UserAccessToken = userAccessToken.TrimExtended();
+        api.Credentials.RefreshUserAccessToken = refreshToken.TrimExtended();
         updateTokenDeadline = DateTime.Now + TimeSpan.FromSeconds(expiresInSeconds);
 
-        File.WriteAllText(USER_ACCESS_TOKEN_FILE, userAccessToken);
-        File.WriteAllText(REFRESH_USER_ACCESS_TOKEN_FILE, refreshToken);
+        File.WriteAllText(USER_ACCESS_TOKEN_FILE, userAccessToken.TrimExtended());
+        File.WriteAllText(REFRESH_USER_ACCESS_TOKEN_FILE, refreshToken.TrimExtended());
     }
     protected BotApp(TwitchCredentials credentials)
     {
@@ -156,18 +161,15 @@ class BotApp
     private async void OnConnectionError(object? sender, OnConnectionErrorArgs e)
     {
         ConsoleHelper.PrintError($"WebSocketConnectionError: {e.Error}");
-        await RefreshTokenIfNeeded();
-        client.Reconnect();
+        Environment.Exit(1);
     }
 
     private async void OnError(object? sender, OnErrorEventArgs e)
     {
         ConsoleHelper.PrintError($"WebSocketError: {e.Exception}");
-        await RefreshTokenIfNeeded();
-        client.Reconnect();
     }
 
-    private void OnMessageReceived(object? sender, OnMessageReceivedArgs e)
+    private async void OnMessageReceived(object? sender, OnMessageReceivedArgs e)
     {
         ConsoleHelper.PrintInfo($"{e.ChatMessage.DisplayName}: {e.ChatMessage.Message}");
         stateManager.ProcessMessage(e.ChatMessage.Message);

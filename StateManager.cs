@@ -1,3 +1,4 @@
+using DeathCounterNETShared;
 class StateManager
 {
     public static readonly TimeSpan COUNTER_PERIOD = TimeSpan.FromSeconds(15);
@@ -14,9 +15,11 @@ class StateManager
     }
     public void ProcessMessage(string message)
     {
+        message = message.TrimExtended();
+
         if(state == State.WaitingForGameStart)
         {         
-            if(!REG_COMMANDS.Contains(message.Trim()))
+            if(!REG_COMMANDS.Contains(message))
             {
                 return;
             }
@@ -45,11 +48,11 @@ class StateManager
                 return;
             }
 
-            if(REG_COMMANDS.Contains(message.Trim()))
+            if(REG_COMMANDS.Contains(message))
             {
                 goCounter.Add();
             }
-            else if(BUFF_COMMANDS.Contains(message.Trim()))
+            else if(BUFF_COMMANDS.Contains(message))
             {
                 buffCounter.Add();
 

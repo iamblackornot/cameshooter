@@ -3,7 +3,7 @@ module.exports = {
     name: 'cameshooter',
     script: 'dotnet',
     args: 'cameshooter.dll',
-    cwd: 'bin/Release/net8.0/',
+    cwd: 'bin/Release/net8.0/linux-x64',
     instances: 1,
     autorestart: true,
     watch: false,

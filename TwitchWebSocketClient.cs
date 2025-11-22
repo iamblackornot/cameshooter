@@ -34,14 +34,19 @@ class TwitchWebSocketClient
     }
 
     public bool IsConnected => client.IsConnected;
-    public void Connect()
-    {
-        client.Connect();
-    }
+    public void Connect() => client.Connect();
+    public void Disconnect() => client.Disconnect();
 
     public void Reconnect()
     {
-        client.Reconnect();
+        if(client.IsConnected)
+        {
+           client.Reconnect();
+        }
+        else
+        {
+            client.Connect();
+        }
     }
 
     public void SendMessage(string message)
