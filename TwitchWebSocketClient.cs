@@ -11,6 +11,7 @@ class TwitchWebSocketClient
     public event EventHandler<OnMessageReceivedArgs>? OnMessageReceived;
     public event EventHandler<OnErrorEventArgs>? OnError;
     public event EventHandler<OnConnectionErrorArgs>? OnConnectionError;
+    public event EventHandler? OnTokenUpdate;
     public TwitchWebSocketClient(string username, string userAccessToken, string channel)
     {
         this.channel = channel;
@@ -25,8 +26,8 @@ class TwitchWebSocketClient
         client = new TwitchClient(customClient);
         client.Initialize(credentials, channel);
 
-        //client.OnLog += Client_OnLog;
-        //client.OnJoinedChannel += Client_OnJoinedChannel;
+        client.OnLog += Client_OnLog;
+        client.OnJoinedChannel += Client_OnJoinedChannel;
         client.OnMessageReceived += Client_OnMessageReceived;
         client.OnConnected += Client_OnConnected;
         client.OnError += Client_OnError;
@@ -69,17 +70,18 @@ class TwitchWebSocketClient
 
     private void Client_OnConnected(object? sender, OnConnectedArgs e)
     {
-        ConsoleHelper.PrintInfo($"Connected to {e.AutoJoinChannel}");
+        ConsoleHelper.PrintInfo($"Connected");
     }
 
     private void Client_OnJoinedChannel(object? sender, OnJoinedChannelArgs e)
     {
-        client.SendMessage(e.Channel, "Hey guys! I am a bot connected via TwitchLib!");
+        ConsoleHelper.PrintInfo($"Joined [{channel}] channel");
     }
 
     private void Client_OnMessageReceived(object? sender, OnMessageReceivedArgs e)
     {
         OnMessageReceived?.Invoke(sender, e);
+        OnTokenUpdate?.Invoke(this, EventArgs.Empty);
     }
 
     private readonly TwitchClient client;

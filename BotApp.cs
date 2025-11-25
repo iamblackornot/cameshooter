@@ -20,8 +20,9 @@ class BotApp
             }
         }
 
-        await RefreshToken();
-        client.Connect();
+        InitTwitchClient();
+        client?.Connect();
+
         Console.ReadLine();
     }
     public static BotApp? CreateIntance()
@@ -121,6 +122,10 @@ class BotApp
         }
 
         UpdateTokens(refreshRes.Data);
+
+        InitTwitchClient();
+        client?.Connect();
+
         ConsoleHelper.PrintInfo("UserAccessToken was refreshed successfully");
 
         return new GoodResult();
@@ -146,6 +151,14 @@ class BotApp
     protected BotApp(TwitchCredentials credentials)
     {
         api = new(credentials);
+    }
+
+    protected void InitTwitchClient()
+    {
+        if(client is not null && client.IsConnected)
+        {
+            client.Disconnect();
+        }
 
         client = new TwitchWebSocketClient(
             DotNetEnv.Env.GetString("USERNAME"),
@@ -154,36 +167,46 @@ class BotApp
         );
 
         stateManager.OnAction += OnAction;
+        client.OnTokenUpdate += OnTokenUpdate;
         client.OnMessageReceived += OnMessageReceived;
         client.OnError += OnError;
         client.OnConnectionError += OnConnectionError;
+
+        ConsoleHelper.PrintInfo("Initialized a new TwitchClient");
     }
+
+    private async void OnTokenUpdate(object? sender, EventArgs e)
+    {
+        await RefreshTokenIfNeeded();
+    }
+
     private async void OnConnectionError(object? sender, OnConnectionErrorArgs e)
     {
         ConsoleHelper.PrintError($"WebSocketConnectionError: {e.Error}");
-        Environment.Exit(1);
+        await RefreshToken();
     }
 
     private async void OnError(object? sender, OnErrorEventArgs e)
     {
         ConsoleHelper.PrintError($"WebSocketError: {e.Exception}");
+        await RefreshToken();
     }
 
     private async void OnMessageReceived(object? sender, OnMessageReceivedArgs e)
     {
-        ConsoleHelper.PrintInfo($"{e.ChatMessage.DisplayName}: {e.ChatMessage.Message}");
+        //ConsoleHelper.PrintInfo($"{e.ChatMessage.DisplayName}: {e.ChatMessage.Message}");
         stateManager.ProcessMessage(e.ChatMessage.Message);
     }
     private void OnAction(object? sender, StateActionEventArgs e)
     {
-        if(client.IsConnected)
+        if(client is not null && client.IsConnected)
         {
             client.SendMessage(e.Message);
         }
     }
 
     private readonly TwitchUserAccessTokenAPI api;
-    private readonly TwitchWebSocketClient client;
+    private TwitchWebSocketClient? client;
     private readonly StateManager stateManager = new ();
     private DateTime updateTokenDeadline = DateTime.MinValue;
 
