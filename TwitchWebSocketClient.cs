@@ -57,15 +57,18 @@ class TwitchWebSocketClient
 
     private void Client_OnConnectionError(object? sender, OnConnectionErrorArgs e)
     {
+        OnTokenUpdate?.Invoke(this, EventArgs.Empty);
         OnConnectionError?.Invoke(sender, e);
     } 
     private void Client_OnError(object? sender, OnErrorEventArgs e)
     {
+        OnTokenUpdate?.Invoke(this, EventArgs.Empty);
         OnError?.Invoke(sender, e);
     } 
     private void Client_OnLog(object? sender, OnLogArgs e)
     {
-        ConsoleHelper.PrintInfo($"{e.DateTime.ToString()}: {e.BotUsername} - {e.Data}");
+        ConsoleHelper.PrintInfo($"{e.DateTime}: {e.BotUsername} - {e.Data}");
+        OnTokenUpdate?.Invoke(this, EventArgs.Empty);
     }
 
     private void Client_OnConnected(object? sender, OnConnectedArgs e)

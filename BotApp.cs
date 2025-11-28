@@ -183,13 +183,13 @@ class BotApp
     private async void OnConnectionError(object? sender, OnConnectionErrorArgs e)
     {
         ConsoleHelper.PrintError($"WebSocketConnectionError: {e.Error}");
-        await RefreshToken();
+        Environment.Exit(1);
     }
 
     private async void OnError(object? sender, OnErrorEventArgs e)
     {
         ConsoleHelper.PrintError($"WebSocketError: {e.Exception}");
-        await RefreshToken();
+        Environment.Exit(1);
     }
 
     private async void OnMessageReceived(object? sender, OnMessageReceivedArgs e)
