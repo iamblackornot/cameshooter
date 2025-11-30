@@ -13,15 +13,11 @@ class TimeSpanCounter
     {
         DateTime now = DateTime.Now;
 
-        //ConsoleHelper.PrintDebug($"{now.Ticks} - check");
-
         while(_queue.TryPeek(out DateTime first) && (now - first) >= Period)
         {
-            //ConsoleHelper.PrintDebug($"{first.Ticks} - dequeue");
             _queue.Dequeue();
         }
 
-        //ConsoleHelper.PrintDebug($"{now.Ticks} - enqueue");
         _queue.Enqueue(now);
     }
 

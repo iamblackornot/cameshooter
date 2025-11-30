@@ -86,16 +86,11 @@ class BotApp
             return new GoodResult();
         }
 
-        var validateRefreshRes = await api.ValidateTokenAsync(api.Credentials.RefreshUserAccessToken);
+        var refreshRes = await RefreshToken();
 
-        if(!validateRefreshRes.IsSuccessful)
+        if(refreshRes.IsSuccessful)
         {
-            return new BadResult(validateRes.ErrorMessage);
-        }
-
-        if(validateRefreshRes.Data.IsValid)
-        {
-            return await RefreshToken();
+            return new GoodResult();
         }
 
         var getTokenRes = await api.GetUserAccessToken(api.Credentials.AuthorizationCode);
