@@ -177,7 +177,7 @@ class BotApp
 
     private async void OnConnectionError(object? sender, OnConnectionErrorArgs e)
     {
-        ConsoleHelper.PrintError($"WebSocketConnectionError: {e.Error}");
+        ConsoleHelper.PrintError($"WebSocketConnectionError: {e.Error.Message}");
         Environment.Exit(1);
     }
 

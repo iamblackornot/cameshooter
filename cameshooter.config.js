@@ -6,7 +6,7 @@ module.exports = {
     cwd: 'bin/Release/net8.0/linux-x64',
     instances: 1,
     autorestart: true,
-    watch: false,
+    watch: true,
     max_memory_restart: '256M',
     env: {
       ASPNETCORE_ENVIRONMENT: 'Production'

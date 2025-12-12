@@ -67,7 +67,7 @@ class TwitchWebSocketClient
     } 
     private void Client_OnLog(object? sender, OnLogArgs e)
     {
-        ConsoleHelper.PrintInfo($"{e.DateTime}: {e.BotUsername} - {e.Data}");
+        //ConsoleHelper.PrintInfo($"{e.DateTime}: {e.BotUsername} - {e.Data}");
         OnTokenUpdate?.Invoke(this, EventArgs.Empty);
     }
 
