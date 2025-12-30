@@ -169,25 +169,38 @@ class BotApp
 
         ConsoleHelper.PrintInfo("Initialized a new TwitchClient");
     }
-
     private async void OnTokenUpdate(object? sender, EventArgs e)
     {
-        await RefreshTokenIfNeeded();
+        if (!tokenUpdateSemaphore.Wait(0)) return;
+
+        try
+        {
+            await RefreshTokenIfNeeded();
+        }
+        catch (Exception ex)
+        {
+            Logger.AddToLogs("OnTokenUpdate", ex.Message);
+            ConsoleHelper.PrintError($"OnTokenUpdateException: {ex.Message}");
+        }
+        finally
+        {
+            tokenUpdateSemaphore.Release();
+        }
     }
 
-    private async void OnConnectionError(object? sender, OnConnectionErrorArgs e)
+    private void OnConnectionError(object? sender, OnConnectionErrorArgs e)
     {
         ConsoleHelper.PrintError($"WebSocketConnectionError: {e.Error.Message}");
         Environment.Exit(1);
     }
 
-    private async void OnError(object? sender, OnErrorEventArgs e)
+    private void OnError(object? sender, OnErrorEventArgs e)
     {
         ConsoleHelper.PrintError($"WebSocketError: {e.Exception}");
         Environment.Exit(1);
     }
 
-    private async void OnMessageReceived(object? sender, OnMessageReceivedArgs e)
+    private void OnMessageReceived(object? sender, OnMessageReceivedArgs e)
     {
         //ConsoleHelper.PrintInfo($"{e.ChatMessage.DisplayName}: {e.ChatMessage.Message}");
         stateManager.ProcessMessage(e.ChatMessage.Message);
@@ -204,5 +217,7 @@ class BotApp
     private TwitchWebSocketClient? client;
     private readonly StateManager stateManager = new ();
     private DateTime updateTokenDeadline = DateTime.MinValue;
+    private readonly SemaphoreSlim tokenUpdateSemaphore = new(1, 1);
+
 
 }

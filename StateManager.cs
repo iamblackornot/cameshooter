@@ -3,7 +3,7 @@ class StateManager
 {
     public static readonly TimeSpan COUNTER_PERIOD = TimeSpan.FromSeconds(15);
     public static readonly TimeSpan PAUSE_BETWEEN_REGS = TimeSpan.FromSeconds(90);
-    public static readonly int TRIGGER_COUNT = 3;
+    public static readonly int TRIGGER_COUNT = 5;
 
     public static readonly HashSet<string> REG_COMMANDS = ["!go", "!пипяу"];
     public static readonly HashSet<string> BUFF_COMMANDS = ["!buff"];
