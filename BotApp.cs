@@ -20,8 +20,11 @@ class BotApp
             }
         }
 
-        InitTwitchClient();
-        client?.Connect();
+        if(client is null || !client.IsConnected)
+        {
+            InitTwitchClient();
+            client?.Connect();
+        }
 
         Console.ReadLine();
     }
