@@ -20,6 +20,8 @@ class BotApp
             }
         }
 
+        stateManager.OnAction += OnAction;
+
         if(client is null || !client.IsConnected)
         {
             InitTwitchClient();
@@ -164,7 +166,6 @@ class BotApp
             DotNetEnv.Env.GetString("CHANNEL")
         );
 
-        stateManager.OnAction += OnAction;
         client.OnTokenUpdate += OnTokenUpdate;
         client.OnMessageReceived += OnMessageReceived;
         client.OnError += OnError;
@@ -219,6 +220,4 @@ class BotApp
     private readonly StateManager stateManager = new ();
     private DateTime updateTokenDeadline = DateTime.MinValue;
     private readonly SemaphoreSlim tokenUpdateSemaphore = new(1, 1);
-
-
 }
